@@ -1,8 +1,11 @@
 language: cpp
 
+before_install:
+   - apt-get -qq update
+   - apt-get -qq install liburi-perl
+
 script:
    - echo "Okay"
-
 
 after_success:
    - if [ $TRAVIS_BRANCH == 'master' ]; then bash upload; fi
