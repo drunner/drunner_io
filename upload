@@ -20,8 +20,9 @@ function putS3
 
   filename="${souce_path##*/}"
   fileextension="${FILE#*.}"
-  content_type=""
-  [ fileextension == "html" ] ||  content_type='application/x-compressed-tar'
+  content_type="text/html"
+  [ fileextension == "html" ] || content_type='application/x-compressed-tar'
+  echo "$content_type"
 
   string="PUT\n\n${content_type}\n${date}\n/${BUCKET}${aws_path}"
   signature=$(echo -en "${string}" | openssl sha1 -hmac "${S3SECRET}" -binary | base64)
