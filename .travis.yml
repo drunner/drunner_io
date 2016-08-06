@@ -1,8 +1,9 @@
 language: cpp
+sudo: required
 
 before_install:
-   - apt-get -qq update
-   - apt-get -qq install liburi-perl
+   - sudo apt-get -qq update
+   - sudo apt-get -qq install liburi-perl
 
 script:
    - echo "Okay"
