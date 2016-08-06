@@ -3,15 +3,6 @@ language: cpp
 script:
    - echo "Okay"
 
-deploy:
-   provider: s3
-   access_key_id: ${ACCESSKEYID}
-   secret_access_key: ${SECRETACCESSKEY}
-   bucket: "drunner"
-   endpoint: "s3-ap-southeast-2.amazonaws.com"
-   skip_cleanup: true
-   region: us-west-2
-   local_dir: www
-   upload-dir: www
-   on:
-      branch: master
+
+after_success:
+   - if [ $TRAVIS_BRANCH == 'master' ]; then bash upload; fi

@@ -1,0 +1,42 @@
+#!/bin/bash
+
+MYDIR=$( dirname "$(readlink -f "$0")" )
+
+function die { echo "$1"; exit 1 ; }
+
+[ -v SECRETACCESSKEY ] || die "Undefined: SECRETACCESSKEY";
+[ -v ACCESSKEYID ] ||  die "Undefined: ACCESSKEYID";
+S3SECRET="${SECRETACCESSKEY}"
+S3KEY="${ACCESSKEYID}"
+
+function putS3
+{
+  souce_path=$1
+  aws_path=$2
+  BUCKET='drunner'
+
+  date="$(LC_ALL=C date -u +"%a, %d %b %Y %X %z")"
+  md5="$(openssl md5 -binary < "${souce_path}" | base64)"
+  content_type='application/x-compressed-tar'
+  string="PUT\n\n${content_type}\n${date}\n/${BUCKET}${aws_path}"
+  signature=$(echo -en "${string}" | openssl sha1 -hmac "${S3SECRET}" -binary | base64)
+  curl -X PUT -T "${souce_path}" \
+   -H "Host: ${BUCKET}.s3.amazonaws.com" \
+   -H "Date: ${date}" \
+   -H "Content-Type: ${content_type}" \
+   -H "Authorization: AWS ${S3KEY}:${signature}" \
+    "https://drunner.s3-ap-southeast-2.amazonaws.com${aws_path}"
+  #    "https://${BUCKET}.s3.amazonaws.com${aws_path}"
+
+  echo "Uploaded ${souce_path} to S3."
+}
+
+function main {
+   find www -type f -print0 | while IFS= read -r -d '' i; do
+      FILE="$(perl -MURI::Escape -e 'print uri_escape($ARGV[0],"^A-Za-z0-9\-\._~\/");' "$i")"
+      echo "$FILE"
+      putS3 "$FILE" "/$FILE"
+   done
+}
+
+main "$@"
