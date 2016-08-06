@@ -1,0 +1,24 @@
+language: cpp
+
+matrix:
+   include:
+     - os: linux
+       dist: trusty
+       sudo: required
+#     - os: osx
+
+before_install:
+
+script:
+
+deploy:
+   provider: s3
+   access_key_id: ${ACCESSKEYID}
+   secret_access_key: ${SECRETACCESSKEY}
+   bucket: "drunner"
+   skip_cleanup: true
+   region: us-west-2
+   local_dir: www
+   upload-dir: www
+   on:
+      branch: master
