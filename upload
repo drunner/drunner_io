@@ -19,7 +19,7 @@ function putS3
   md5="$(openssl md5 -binary < "${souce_path}" | base64)"
 
   filename="${souce_path##*/}"
-  fileextension="${FILE#*.}"
+  fileextension="${filename#*.}"
   content_type="text/html"
   [ fileextension == "html" ] || content_type='application/x-compressed-tar'
   echo "$content_type"
