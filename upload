@@ -20,7 +20,7 @@ function putS3
 
   fileextension="${souce_path##*.}"
   content_type="text/html"
-  [ "$fileextension" == "html" ] || content_type='application/x-compressed-tar'
+  [ "$fileextension" == "html" ] || [ "$fileextension" == "css" ] || [ "$fileextension" == "js" ] || content_type='application/x-compressed-tar'
   echo "  $content_type"
 
   string="PUT\n\n${content_type}\n${date}\n/${BUCKET}${aws_path}"
