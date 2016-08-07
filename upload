@@ -11,20 +11,22 @@ S3KEY="${ACCESSKEYID}"
 
 function putS3
 {
-  souce_path=$1
+  source_path=$1
   aws_path=$2
   BUCKET='drunner'
 
-  date="$(LC_ALL=C date -u +"%a, %d %b %Y %X %z")"
-  md5="$(openssl md5 -binary < "${souce_path}" | base64)"
+  echo "$source_path"
 
-  content_type=$(file -b --mime-type "$source_path")
+  date="$(LC_ALL=C date -u +"%a, %d %b %Y %X %z")"
+  md5="$(openssl md5 -binary < "${source_path}" | base64)"
+
+  content_type="$(file -b --mime-type "${source_path}")"
   echo "  $content_type"
 
   string="PUT\n\n${content_type}\n${date}\n/${BUCKET}${aws_path}"
   signature=$(echo -en "${string}" | openssl sha1 -hmac "${S3SECRET}" -binary | base64)
 
-  curl -X PUT -T "${souce_path}" \
+  curl -X PUT -T "${source_path}" \
    -H "Host: ${BUCKET}.s3.amazonaws.com" \
    -H "Date: ${date}" \
    -H "Content-Type: ${content_type}" \
@@ -32,13 +34,12 @@ function putS3
     "https://drunner.s3-ap-southeast-2.amazonaws.com${aws_path}"
   #    "https://${BUCKET}.s3.amazonaws.com${aws_path}"
 
-  echo "  Uploaded ${souce_path} to S3."
+  echo "  Uploaded ${source_path} to S3."
 }
 
 function main {
    find www -type f -print0 | while IFS= read -r -d '' i; do
       FILE="$(perl -MURI::Escape -e 'print uri_escape($ARGV[0],"^A-Za-z0-9\-\._~\/");' "$i")"
-      echo "$FILE"
       putS3 "$FILE" "/$FILE"
    done
 }
