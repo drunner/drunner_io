@@ -18,7 +18,7 @@ function putS3
   date="$(LC_ALL=C date -u +"%a, %d %b %Y %X %z")"
   md5="$(openssl md5 -binary < "${souce_path}" | base64)"
 
-  content_type=$(file -b --mime-type image.png)
+  content_type=$(file -b --mime-type "$source_path")
   echo "  $content_type"
 
   string="PUT\n\n${content_type}\n${date}\n/${BUCKET}${aws_path}"
